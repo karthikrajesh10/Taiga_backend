@@ -12,8 +12,8 @@ built using:
 
 🚀 1. Clone the Repository
 
-    git clone https://github.com/YOUR_USERNAME/taiga-clone-backend.git
-    cd taiga-clone-backend
+    git clone https://github.com/karthikrajesh10/Taiga_backend.git
+    cd Taiga_backend
 
 ------------------------------------------------------------------------
 
