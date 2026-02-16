@@ -73,6 +73,7 @@ Inside psql shell:
     ALTER ROLE taiga_user SET timezone TO 'UTC';
 
     GRANT ALL PRIVILEGES ON DATABASE taiga_clone TO taiga_user;
+    GRANT ALL ON SCHEMA public TO taiga_user;
 
 Exit:
 
