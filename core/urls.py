@@ -14,9 +14,33 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path,include
+# from django.contrib import admin
+# from django.urls import path,include
 
+# from rest_framework_simplejwt.views import (
+#     TokenObtainPairView,
+#     TokenRefreshView,
+# )
+
+# urlpatterns = [
+#     path('admin/', admin.site.urls),
+
+#     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+#     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+
+
+
+
+#     path("api/", include("projects.urls")),
+#     path("api/", include("userstories.urls")),
+#     path("api/", include("issues.urls")),
+#     path("api/", include("sprints.urls")), 
+#     path("api/users/", include("users.urls")),
+#     path("api/tasks/", include("tasks.urls")),
+# ]
+
+from django.contrib import admin
+from django.urls import path, include
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -25,16 +49,18 @@ from rest_framework_simplejwt.views import (
 urlpatterns = [
     path('admin/', admin.site.urls),
 
+    # JWT
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 
-
-
-
-    path("api/", include("projects.urls")),
-    path("api/", include("userstories.urls")),
-    path("api/", include("issues.urls")),
-    path("api/", include("sprints.urls")), 
+    # Users
     path("api/users/", include("users.urls")),
+
+    # Main apps
+    path("api/projects/", include("projects.urls")),
+    path("api/memberships/", include("projects.membership_urls")),
+    path("api/sprints/", include("sprints.urls")),
+    path("api/userstories/", include("userstories.urls")),
     path("api/tasks/", include("tasks.urls")),
+    path("api/issues/", include("issues.urls")),
 ]

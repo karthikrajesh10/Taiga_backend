@@ -57,13 +57,13 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     
-
+    'users',
     'projects',
     'sprints',
     'userstories',
     'tasks',
     'issues',
-    'users',
+    
 ]
 
 MIDDLEWARE = [
@@ -194,3 +194,5 @@ CORS_ALLOW_HEADERS = [
     "authorization",
     "content-type",
 ]
+
+AUTH_USER_MODEL = "users.User"

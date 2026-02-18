@@ -36,11 +36,27 @@ class SprintViewSet(ModelViewSet):
     serializer_class = SprintSerializer
     permission_classes = [IsAuthenticated]
 
+    # def get_queryset(self):
+    #     queryset = Sprint.objects.all()
+
+    #     project_slug = self.request.query_params.get("project_slug")
+    #     if project_slug:
+    #         queryset = queryset.filter(project__slug=project_slug)
+
+    #     return queryset
     def get_queryset(self):
-        queryset = Sprint.objects.all()
+        user = self.request.user
+
+        if user.is_superuser:
+            queryset = Sprint.objects.all()
+        else:
+            queryset = Sprint.objects.filter(
+                project__members__user=user
+            ).distinct()
 
         project_slug = self.request.query_params.get("project_slug")
         if project_slug:
             queryset = queryset.filter(project__slug=project_slug)
 
         return queryset
+

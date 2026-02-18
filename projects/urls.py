@@ -1,8 +1,25 @@
+# # from rest_framework.routers import DefaultRouter
+# # from .views import ProjectViewSet,ProjectMembershipViewSet
+
+# # router = DefaultRouter()
+# # router.register(r"projects", ProjectViewSet, basename="project")
+# # router.register(r"memberships", ProjectMembershipViewSet, basename="membership")
+
+# # urlpatterns = router.urls
+
+# from rest_framework.routers import DefaultRouter
+# from .views import ProjectViewSet, ProjectMembershipViewSet
+
+# router = DefaultRouter()
+# router.register(r"", ProjectViewSet, basename="project")
+# router.register(r"memberships", ProjectMembershipViewSet, basename="membership")
+
+# urlpatterns = router.urls
+
 from rest_framework.routers import DefaultRouter
-from .views import ProjectViewSet,ProjectMembershipViewSet
+from .views import ProjectViewSet
 
 router = DefaultRouter()
-router.register(r"projects", ProjectViewSet, basename="project")
-router.register(r"memberships", ProjectMembershipViewSet, basename="membership")
+router.register(r"", ProjectViewSet, basename="project")
 
 urlpatterns = router.urls
