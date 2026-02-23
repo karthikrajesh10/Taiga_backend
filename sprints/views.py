@@ -19,6 +19,8 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Sprint
 from .serializers import SprintSerializer
 
+from core.permissions import IsManager
+
 # class SprintViewSet(ModelViewSet):
 #     serializer_class = SprintSerializer
 #     permission_classes = [IsAuthenticated]
@@ -44,6 +46,12 @@ class SprintViewSet(ModelViewSet):
     #         queryset = queryset.filter(project__slug=project_slug)
 
     #     return queryset
+    def get_permissions(self):
+        if self.action in ["create", "update", "partial_update", "destroy"]:
+        #if self.action == "create":
+            return [IsAuthenticated(), IsManager()]
+        return [IsAuthenticated()]
+
     def get_queryset(self):
         user = self.request.user
 

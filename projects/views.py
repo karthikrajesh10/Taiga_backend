@@ -92,6 +92,7 @@ from rest_framework.exceptions import PermissionDenied
 
 from .models import Project, ProjectMembership
 from .serializers import ProjectSerializer, ProjectMemberSerializer
+from core.permissions import IsPM
 
 
 class ProjectViewSet(ModelViewSet):
@@ -107,6 +108,11 @@ class ProjectViewSet(ModelViewSet):
         return Project.objects.filter(
             members__user=user
         ).distinct()
+    def get_permissions(self):
+        if self.action in ["create", "update", "partial_update", "destroy"]:
+        #if self.action == "create":
+            return [IsAuthenticated(), IsPM()]
+        return [IsAuthenticated()]
 
     def perform_create(self, serializer):
         project = serializer.save(created_by=self.request.user)
@@ -131,3 +137,8 @@ class ProjectMembershipViewSet(ModelViewSet):
         return ProjectMembership.objects.filter(
             project__members__user=user
         ).distinct()
+    def get_permissions(self):
+        if self.action in ["create", "update", "partial_update", "destroy"]:
+        #if self.action == "create":
+            return [IsAuthenticated(), IsPM()]
+        return [IsAuthenticated()]

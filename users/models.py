@@ -8,7 +8,10 @@ class User(AbstractUser):
     ROLE_CHOICES = (
         ("PM", "Project Manager"),
         ("DEV", "Developer"),
-        ("QA", "QA Engineer"),
+        ("QA", "QA Tester"),
+        ("MGR", "Manager"),
+        ("AP", "Approver"),
+        ("TL", "Test Lead"),
     )
 
     employee_id = models.CharField(

@@ -70,7 +70,10 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from .models import User
-from .serializers import UserSerializer, SignupSerializer
+from .serializers import UserSerializer, SignupSerializer,UserListSerializer
+from rest_framework.generics import ListAPIView
+from core.permissions import IsPM
+from core.permissions import IsPMOrManager
 
 
 class MeView(APIView):
@@ -95,3 +98,10 @@ class SignupView(APIView):
             )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class UserListView(ListAPIView):
+    serializer_class = UserListSerializer
+    permission_classes = [IsAuthenticated, IsPMOrManager]  # Only PM can see all users
+
+    def get_queryset(self):
+        return User.objects.all().order_by("id")

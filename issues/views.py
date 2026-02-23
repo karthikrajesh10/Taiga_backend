@@ -159,6 +159,8 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 from .models import Issue
 from .serializers import IssueSerializer
+from rest_framework.exceptions import PermissionDenied
+
 
 
 class IssueViewSet(ModelViewSet):
@@ -192,4 +194,32 @@ class IssueViewSet(ModelViewSet):
 
 
     def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
+        # serializer.save(created_by=self.request.user)
+        user = self.request.user
+        issue_type = serializer.validated_data.get("type")
+
+         # if issue_type == "Bug" and not (user.is_superuser or user.role in ["QA", "TL"]):
+        if issue_type == "Bug" and user.role not in ["QA", "TL"]:
+           
+            raise PermissionDenied("Only QA or Test Lead can create bugs")
+
+        serializer.save(created_by=user)
+
+    def perform_update(self, serializer):
+        user = self.request.user
+
+        # if user.role not in ["QA", "TL","MGR"]:
+        #     raise PermissionDenied("Only QA or Test Lead can update issues")
+        if not (user.is_superuser or user.role in ["QA","TL" ,"MGR"]):
+            raise PermissionDenied("You cannot modify tasks")
+
+        serializer.save()
+    def destroy(self, request, *args, **kwargs):
+        user = request.user
+
+        # Only QA, TL, MGR or superuser can delete
+        if not (user.is_superuser or user.role in ["QA", "TL", "MGR"]):
+            raise PermissionDenied("You cannot delete this issue")
+
+        return super().destroy(request, *args, **kwargs)
+        

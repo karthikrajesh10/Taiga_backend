@@ -31,64 +31,20 @@ from rest_framework.permissions import IsAuthenticated
 
 from .models import UserStory
 from .serializers import UserStorySerializer
+from core.permissions import IsManager
 
 
 class UserStoryViewSet(ModelViewSet):
     serializer_class = UserStorySerializer
     permission_classes = [IsAuthenticated]
 
-    # def get_queryset(self):
-    #     queryset = UserStory.objects.all()
-
-    #     # Filter by project ID (optional)
-    #     project_id = self.request.query_params.get("project")
-        
-    #     if project_id:
-    #         queryset = queryset.filter(project_id=project_id)
-
-        
-
-    #     # Filter by project slug (recommended for frontend)
-    #     project_slug = self.request.query_params.get("project_slug")
-    #     if project_slug:
-    #         queryset = queryset.filter(project__slug=project_slug)
-
-    #     sprint_id = self.request.query_params.get("sprint")
-    #     sprint_isnull = self.request.query_params.get("sprint__isnull")
-
-    #     # if sprint_id == "null":
-    #     #     queryset = queryset.filter(sprint__isnull=True)
-
-    #     # # Sprint stories
-    #     # elif sprint_id:
-    #     #     queryset = queryset.filter(sprint_id=sprint_id)
-    #     if sprint_isnull == "true":
-    #         queryset = queryset.filter(sprint__isnull=True)
-
-    # # Sprint stories
-    #     elif sprint_id:
-    #         queryset = queryset.filter(sprint_id=sprint_id)
-
-    #     return queryset
-    # def get_queryset(self):
-    #     queryset = UserStory.objects.all()
-
-    #     # Filter by project slug
-    #     project_slug = self.request.query_params.get("project_slug")
-    #     if project_slug:
-    #         queryset = queryset.filter(project__slug=project_slug)
-
-    #     # Backlog filter
-    #     sprint_isnull = self.request.query_params.get("sprint_isnull")
-    #     if sprint_isnull == "true":
-    #         queryset = queryset.filter(sprint__isnull=True)
-
-    #     # Specific sprint
-    #     sprint_id = self.request.query_params.get("sprint")
-    #     if sprint_id:
-    #         queryset = queryset.filter(sprint_id=sprint_id)
-
-    #     return queryset
+   
+    def get_permissions(self):
+        if self.action in ["create", "update", "partial_update", "destroy"]:
+        #if self.action == "create":
+            return [IsAuthenticated(), IsManager()]
+        return [IsAuthenticated()]
+    
     def get_queryset(self):
         user = self.request.user
 

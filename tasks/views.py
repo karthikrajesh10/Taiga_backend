@@ -98,6 +98,10 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 from .models import Task
 from .serializers import TaskSerializer
+from core.permissions import IsManager
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 
 class TaskViewSet(ModelViewSet):
@@ -113,6 +117,13 @@ class TaskViewSet(ModelViewSet):
     #         queryset = queryset.filter(user_story_id=user_story_id)
 
     #     return queryset
+    def get_permissions(self):
+        if self.action in ["create", "destroy"]:
+        
+        #if self.action == "create":
+            return [IsAuthenticated(), IsManager()]
+        return [IsAuthenticated()]
+    
     def get_queryset(self):
         user = self.request.user
 
@@ -128,4 +139,36 @@ class TaskViewSet(ModelViewSet):
             queryset = queryset.filter(user_story_id=user_story_id)
 
         return queryset
+
+    def perform_update(self, serializer):
+        user = self.request.user
+
+        # if user.role not in ["DEV", "MGR"]:
+        #     raise PermissionDenied("You cannot modify tasks")
+        if not (user.is_superuser or user.role in ["DEV", "MGR"]):
+            raise PermissionDenied("You cannot modify tasks")
+
+        serializer.save()
+    # def destroy(self, request, *args, **kwargs):
+    #     user = request.user
+
+    #     # Only  MGR or superuser can delete
+    #     #if not (user.is_superuser or user.role =="MGR" ):
+    #     if not (user.is_superuser or user.role in ["DEV", "MGR"]):
+
+    #         raise PermissionDenied("You cannot delete this task")
+
+    #     return super().destroy(request, *args, **kwargs)
+
+    @action(detail=False, methods=["get"], url_path="my")
+    def my_tasks(self, request):
+        user = request.user
+
+        queryset = Task.objects.filter(
+            assignee=user
+        ).select_related("user_story")
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+        
 
