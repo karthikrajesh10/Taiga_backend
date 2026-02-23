@@ -1,18 +1,26 @@
-
+------------------------------------------------------------------------
 
 🚀 Taiga Clone Backend
 
-Agile Project Management REST API (Django + DRF + PostgreSQL + JWT)
+Agile Project Management REST API
 
-A production-ready REST API backend inspired by Taiga, built for
-managing:
+Built with Django 5 + Django REST Framework + PostgreSQL + JWT
 
--   Projects
--   Sprints
--   User Stories
--   Tasks
--   Issues
--   Role-Based Access Control (RBAC)
+------------------------------------------------------------------------
+
+📌 Overview
+
+Taiga Clone Backend is a production-ready REST API for managing:
+
+-   👤 Users
+-   📁 Projects
+-   🏃 Sprints
+-   📘 User Stories
+-   📋 Tasks
+-   🐞 Issues
+-   🔐 Role-Based Access Control (RBAC)
+
+Authentication is handled using JWT (JSON Web Tokens).
 
 ------------------------------------------------------------------------
 
@@ -21,13 +29,13 @@ managing:
 -   Django 5
 -   Django REST Framework
 -   PostgreSQL
--   JWT Authentication (SimpleJWT)
--   Role-Based Access Control (RBAC)
+-   SimpleJWT
+-   RBAC (Custom Role Permissions)
 -   CORS Support
 
 ------------------------------------------------------------------------
 
-📦 Installation Guide
+⚙ Installation Guide
 
 ------------------------------------------------------------------------
 
@@ -75,13 +83,11 @@ Or:
 
 🐘 PostgreSQL Setup
 
-Make sure PostgreSQL is installed and running.
-
-------------------------------------------------------------------------
-
-Create Database & User
+Login:
 
     psql -U postgres
+
+Create database and user:
 
     CREATE DATABASE taiga_clone;
 
@@ -102,7 +108,7 @@ Exit:
 
 🗑 Reset Database (If Tables Already Exist)
 
-If migrations conflict or tables already exist:
+If migrations conflict:
 
     psql -U postgres
 
@@ -113,13 +119,13 @@ Then:
 
     python manage.py migrate
 
-⚠ This permanently deletes all data. Use only in development.
+⚠ This deletes all data (development use only).
 
 ------------------------------------------------------------------------
 
 🔐 Environment Variables (.env)
 
-Create a .env file in the project root:
+Create .env file in project root:
 
     # DJANGO
     SECRET_KEY=your-generated-secret-key
@@ -143,14 +149,14 @@ Generate secret key:
 
 ------------------------------------------------------------------------
 
-⚙ Run Migrations
+🔄 Run Migrations
 
     python manage.py makemigrations
     python manage.py migrate
 
 ------------------------------------------------------------------------
 
-👤 Create Admin User
+👤 Create Superuser
 
     python manage.py createsuperuser
 
@@ -168,7 +174,13 @@ Server runs at:
 
 🔐 Authentication (JWT)
 
-This backend uses JWT authentication.
+Base URL:
+
+    http://127.0.0.1:8000/
+
+All protected endpoints require:
+
+    Authorization: Bearer <access_token>
 
 ------------------------------------------------------------------------
 
@@ -176,14 +188,14 @@ This backend uses JWT authentication.
 
 POST /api/token/
 
-Sample Request
+Request
 
     {
       "username": "your_username",
       "password": "your_password"
     }
 
-Sample Response
+Response
 
     {
       "refresh": "refresh_token_here",
@@ -202,66 +214,177 @@ POST /api/token/refresh/
 
 ------------------------------------------------------------------------
 
-🔐 Required Header (For All Protected APIs)
-
-    Authorization: Bearer <access_token>
+📡 API Documentation
 
 ------------------------------------------------------------------------
 
 👤 Users API
 
-  Endpoint             Method   Description
-  -------------------- -------- --------------------------------
-  /api/users/signup/   POST     Register new user
-  /api/users/me/       GET      Get logged-in user
-  /api/users/          GET      List all users (PM & MGR only)
+🔹 Signup
+
+POST /api/users/signup/ Permission: Public
+
+    {
+      "username": "your_username",
+      "email": "your_gmail",
+      "password": "your_password",
+      "role": "DEV"
+    }
+
+------------------------------------------------------------------------
+
+🔹 Get Logged-in User
+
+GET /api/users/me/ Permission: Authenticated Users
+
+------------------------------------------------------------------------
+
+🔹 Get All Users
+
+GET /api/users/ Permission: PM, MGR only
+
+Response:
+
+    [
+      {
+        "id": 1,
+        "username": "manager1",
+        "email": "m@test.com",
+        "role": "MGR"
+      }
+    ]
 
 ------------------------------------------------------------------------
 
 📁 Projects API
 
-  Endpoint         Method
-  ---------------- -----------
-  /api/projects/   GET, POST
+🔹 Create Project
+
+POST /api/projects/ Permission: PM only
+
+    {
+      "name": "Backend System",
+      "slug": "backend-system",
+      "description": "Core PM Tool",
+      "is_private": false
+    }
+
+------------------------------------------------------------------------
+
+🔹 List Projects
+
+GET /api/projects/ Permission: Authenticated Users
 
 ------------------------------------------------------------------------
 
 🏃 Sprints API
 
-  Endpoint        Method
-  --------------- -----------
-  /api/sprints/   GET, POST
+🔹 Create Sprint
+
+POST /api/sprints/ Permission: MGR only
+
+    {
+      "name": "Sprint 1",
+      "slug": "sprint-1",
+      "project_slug": "backend-system",
+      "start_date": "2026-02-16",
+      "end_date": "2026-02-28"
+    }
 
 ------------------------------------------------------------------------
 
 📘 User Stories API
 
-  Endpoint                 Method
-  ------------------------ -----------
-  /api/userstories/        GET, POST
-  /api/userstories/{id}/   PATCH
+🔹 Create Story
+
+POST /api/userstories/ Permission: MGR only
+
+    {
+      "title": "Implement Login",
+      "slug": "implement-login",
+      "description": "JWT login feature",
+      "priority": 1,
+      "project_slug": "backend-system"
+    }
+
+------------------------------------------------------------------------
+
+🔹 Move Story to Sprint
+
+PATCH /api/userstories/{id}/
+
+    {
+      "sprint": 1
+    }
 
 ------------------------------------------------------------------------
 
 📋 Tasks API
 
-  Endpoint           Method
-  ------------------ -----------
-  /api/tasks/        GET, POST
-  /api/tasks/{id}/   PATCH
-  /api/tasks/my/     GET
+🔹 Create Task
+
+POST /api/tasks/ Permission: MGR only
+
+    {
+      "user_story": 1,
+      "title": "Create JWT Endpoint",
+      "description": "Implement token endpoint"
+    }
+
+------------------------------------------------------------------------
+
+🔹 Update Task
+
+PATCH /api/tasks/{id}/
+
+Example:
+
+    {
+      "status": 2
+    }
+
+------------------------------------------------------------------------
+
+🔹 Get My Tasks
+
+GET /api/tasks/my/ Permission: Authenticated Users
+
+Example:
+
+    [
+      {
+        "id": 1,
+        "user_story": 1,
+        "title": "Create JWT Endpoint",
+        "status": 3,
+        "assignee": 4,
+        "created_at": "2026-02-16T09:53:19Z"
+      }
+    ]
 
 ------------------------------------------------------------------------
 
 🐞 Issues API
 
-  Endpoint       Method
-  -------------- -----------
-  /api/issues/   GET, POST
+🔹 Create Issue
+
+POST /api/issues/
+
+Permission:
+
+-   Bug → QA, TL
+-   Question/Enhancement → All roles
+
+    {
+      "task": 1,
+      "type": "Bug",
+      "title": "Token expires early",
+      "description": "Access token expires too fast"
+    }
 
 ------------------------------------------------------------------------
 
-🔢 Status Values (Frontend Mapping Required)
+🔢 Status Values
 
   Value   Meaning
   ------- ----------------
@@ -269,6 +392,8 @@ POST /api/token/refresh/
   2       In Progress
   3       Ready For Test
   4       Done
+
+Frontend must map numeric values to UI labels.
 
 ------------------------------------------------------------------------
 
@@ -315,35 +440,18 @@ POST /api/token/refresh/
   Approve Document                                   ❌   ❌    ❌    ❌   ❌   ✅
   ----------------------------------------------------------------------------------
 
-------------------------------------------------------------------------
-
-🔎 Special Access Rule
-
-GET /api/users/
-
-Accessible only by:
-
--   PM
--   MGR
-
-Others receive:
-
-    403 Forbidden
+Special Rule: GET /api/users/ accessible only by PM and MGR.
 
 ------------------------------------------------------------------------
 
 🚫 Error Handling
 
-  Status Code   Meaning
-  ------------- --------------------------------------
-  400           Bad Request
-  401           Unauthorized (Invalid/Expired Token)
-  403           Permission Denied
-
-Frontend should:
-
--   Redirect to login on 401
--   Show permission message on 403
+  Code   Meaning
+  ------ --------------------------------------
+  400    Validation error
+  401    Unauthorized (Token missing/expired)
+  403    Permission denied
+  404    Resource not found
 
 ------------------------------------------------------------------------
 
@@ -351,22 +459,20 @@ Frontend should:
 
     CORS_ALLOW_ALL_ORIGINS = True
 
-⚠ In production, restrict allowed origins.
+⚠ Restrict origins in production.
 
 ------------------------------------------------------------------------
 
 🧱 Production Deployment Checklist
 
-Before deploying:
-
 -   Set DEBUG=False
 -   Configure proper ALLOWED_HOSTS
 -   Use strong DB password
 -   Use secure SECRET_KEY
--   Configure HTTPS
+-   Enable HTTPS
 -   Use Gunicorn
 -   Use Nginx
--   Disable CORS_ALLOW_ALL_ORIGINS
+-   Restrict CORS
 
 ------------------------------------------------------------------------
 
@@ -374,7 +480,7 @@ Before deploying:
 
     core/
     │
-    ├── core/              # Project settings
+    ├── core/
     ├── projects/
     ├── sprints/
     ├── userstories/
@@ -391,3 +497,5 @@ Before deploying:
 👨‍💻 Author
 
 Karthik R S
+
+------------------------------------------------------------------------
