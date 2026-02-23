@@ -1,41 +1,60 @@
-📘 Taiga Clone Backend (Django + PostgreSQL + JWT)
 
-A REST API backend for a Taiga-inspired Agile Project Management system
-built using:
+
+🚀 Taiga Clone Backend
+
+Agile Project Management REST API (Django + DRF + PostgreSQL + JWT)
+
+A production-ready REST API backend inspired by Taiga, built for
+managing:
+
+-   Projects
+-   Sprints
+-   User Stories
+-   Tasks
+-   Issues
+-   Role-Based Access Control (RBAC)
+
+------------------------------------------------------------------------
+
+🛠 Tech Stack
 
 -   Django 5
 -   Django REST Framework
 -   PostgreSQL
 -   JWT Authentication (SimpleJWT)
+-   Role-Based Access Control (RBAC)
+-   CORS Support
 
 ------------------------------------------------------------------------
 
-🚀 1. Clone the Repository
+📦 Installation Guide
+
+------------------------------------------------------------------------
+
+1️⃣ Clone Repository
 
     git clone https://github.com/karthikrajesh10/Taiga_backend.git
     cd Taiga_backend
 
 ------------------------------------------------------------------------
 
-🐍 2. Create & Activate Virtual Environment
+2️⃣ Create Virtual Environment
 
-Windows:
+Windows
 
     python -m venv venv
     venv\Scripts\activate
 
-Mac/Linux:
+Mac/Linux
 
     python3 -m venv venv
     source venv/bin/activate
 
 ------------------------------------------------------------------------
 
-📦 3. Install Required Packages
+3️⃣ Install Dependencies (Compulsory)
 
-    pip install -r requirements.txt
-
-If installing manually, required core packages are:
+Install Individually
 
     pip install django
     pip install djangorestframework
@@ -44,25 +63,25 @@ If installing manually, required core packages are:
     pip install django-cors-headers
     pip install python-dotenv
 
+✅ Install All In One Command
+
+    pip install django djangorestframework djangorestframework-simplejwt psycopg2-binary django-cors-headers python-dotenv
+
+Or:
+
+    pip install -r requirements.txt
+
 ------------------------------------------------------------------------
 
-🐘 4. PostgreSQL Setup
+🐘 PostgreSQL Setup
 
 Make sure PostgreSQL is installed and running.
 
 ------------------------------------------------------------------------
 
-🔹 4.1 Login to PostgreSQL
+Create Database & User
 
     psql -U postgres
-
-If password prompted, enter your postgres password.
-
-------------------------------------------------------------------------
-
-🔹 4.2 Create Database & User
-
-Inside psql shell:
 
     CREATE DATABASE taiga_clone;
 
@@ -81,71 +100,63 @@ Exit:
 
 ------------------------------------------------------------------------
 
-🔐 5. Environment Variables Setup (.env)
+🗑 Reset Database (If Tables Already Exist)
 
-Create a file in the project root (same level as manage.py):
+If migrations conflict or tables already exist:
 
-    .env
+    psql -U postgres
 
-Add the following:
+    DROP DATABASE taiga_clone;
+    CREATE DATABASE taiga_clone OWNER taiga_user;
 
-    # =============================
-    # DJANGO SETTINGS
-    # =============================
+Then:
 
+    python manage.py migrate
+
+⚠ This permanently deletes all data. Use only in development.
+
+------------------------------------------------------------------------
+
+🔐 Environment Variables (.env)
+
+Create a .env file in the project root:
+
+    # DJANGO
     SECRET_KEY=your-generated-secret-key
     DEBUG=True
     ALLOWED_HOSTS=127.0.0.1,localhost
 
-    # =============================
-    # DATABASE CONFIG
-    # =============================
-
+    # DATABASE
     DB_NAME=taiga_clone
     DB_USER=taiga_user
     DB_PASSWORD=strongpassword
     DB_HOST=localhost
     DB_PORT=5432
 
-    # =============================
-    # JWT CONFIG
-    # =============================
-
+    # JWT
     ACCESS_TOKEN_MINUTES=60
     REFRESH_TOKEN_DAYS=1
 
-------------------------------------------------------------------------
-
-🔹 Generate SECRET_KEY
-
-Run:
+Generate secret key:
 
     python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
 
-Copy the output into .env.
-
 ------------------------------------------------------------------------
 
-⚙ 6. Apply Migrations
+⚙ Run Migrations
 
     python manage.py makemigrations
     python manage.py migrate
 
 ------------------------------------------------------------------------
 
-👤 7. Create Superuser (Admin)
+👤 Create Admin User
 
     python manage.py createsuperuser
 
-Enter:
-
--   Username
--   Email
--   Password
-
 ------------------------------------------------------------------------
 
-▶ 8. Run the Development Server
+▶ Run Development Server
 
     python manage.py runserver
 
@@ -155,33 +166,207 @@ Server runs at:
 
 ------------------------------------------------------------------------
 
-🔑 9. Authentication Flow (JWT)
+🔐 Authentication (JWT)
 
-🔹 Obtain Token
+This backend uses JWT authentication.
 
-    POST /api/token/
+------------------------------------------------------------------------
 
-Body:
+🔹 Login
+
+POST /api/token/
+
+Sample Request
 
     {
-      "username": "admin",
-      "password": "yourpassword"
+      "username": "your_username",
+      "password": "your_password"
     }
 
-Response:
+Sample Response
 
     {
-      "refresh": "...",
-      "access": "..."
+      "refresh": "refresh_token_here",
+      "access": "access_token_here"
     }
 
 ------------------------------------------------------------------------
 
-🔹 Use Access Token
+🔹 Refresh Token
 
-Add header in requests:
+POST /api/token/refresh/
+
+    {
+      "refresh": "refresh_token_here"
+    }
+
+------------------------------------------------------------------------
+
+🔐 Required Header (For All Protected APIs)
 
     Authorization: Bearer <access_token>
+
+------------------------------------------------------------------------
+
+👤 Users API
+
+  Endpoint             Method   Description
+  -------------------- -------- --------------------------------
+  /api/users/signup/   POST     Register new user
+  /api/users/me/       GET      Get logged-in user
+  /api/users/          GET      List all users (PM & MGR only)
+
+------------------------------------------------------------------------
+
+📁 Projects API
+
+  Endpoint         Method
+  ---------------- -----------
+  /api/projects/   GET, POST
+
+------------------------------------------------------------------------
+
+🏃 Sprints API
+
+  Endpoint        Method
+  --------------- -----------
+  /api/sprints/   GET, POST
+
+------------------------------------------------------------------------
+
+📘 User Stories API
+
+  Endpoint                 Method
+  ------------------------ -----------
+  /api/userstories/        GET, POST
+  /api/userstories/{id}/   PATCH
+
+------------------------------------------------------------------------
+
+📋 Tasks API
+
+  Endpoint           Method
+  ------------------ -----------
+  /api/tasks/        GET, POST
+  /api/tasks/{id}/   PATCH
+  /api/tasks/my/     GET
+
+------------------------------------------------------------------------
+
+🐞 Issues API
+
+  Endpoint       Method
+  -------------- -----------
+  /api/issues/   GET, POST
+
+------------------------------------------------------------------------
+
+🔢 Status Values (Frontend Mapping Required)
+
+  Value   Meaning
+  ------- ----------------
+  1       New
+  2       In Progress
+  3       Ready For Test
+  4       Done
+
+------------------------------------------------------------------------
+
+🔐 Role-Based Access Control (RBAC)
+
+🎭 Roles
+
+  Code   Role
+  ------ -----------------
+  PM     Project Manager
+  MGR    Manager
+  DEV    Developer
+  QA     Quality Analyst
+  TL     Team Lead
+  AP     Approver
+
+------------------------------------------------------------------------
+
+🛡 Permission Matrix
+
+  ----------------------------------------------------------------------------------
+  Action                                             PM   MGR   DEV   QA   TL   AP
+  -------------------------------------------------- ---- ----- ----- ---- ---- ----
+  Create User                                        ✅   ❌    ❌    ❌   ❌   ❌
+
+  Assign Project                                     ✅   ❌    ❌    ❌   ❌   ❌
+
+  Create Sprint                                      ❌   ✅    ❌    ❌   ❌   ❌
+
+  Create Story                                       ❌   ✅    ❌    ❌   ❌   ❌
+
+  Create Task                                        ❌   ✅    ❌    ❌   ❌   ❌
+
+  Assign Task                                        ❌   ✅    ❌    ❌   ❌   ❌
+
+  Estimate Hours                                     ❌   ❌    ✅    ❌   ❌   ❌
+
+  Move Task Status                                   ❌   ❌    ✅    ❌   ❌   ❌
+
+  Create Issue (Bug)                                 ❌   ❌    ❌    ✅   ✅   ❌
+
+  Create Issue (Question/Enhancement)                ✅   ✅    ✅    ✅   ✅   ✅
+
+  Approve Document                                   ❌   ❌    ❌    ❌   ❌   ✅
+  ----------------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+
+🔎 Special Access Rule
+
+GET /api/users/
+
+Accessible only by:
+
+-   PM
+-   MGR
+
+Others receive:
+
+    403 Forbidden
+
+------------------------------------------------------------------------
+
+🚫 Error Handling
+
+  Status Code   Meaning
+  ------------- --------------------------------------
+  400           Bad Request
+  401           Unauthorized (Invalid/Expired Token)
+  403           Permission Denied
+
+Frontend should:
+
+-   Redirect to login on 401
+-   Show permission message on 403
+
+------------------------------------------------------------------------
+
+🌐 CORS (Development Only)
+
+    CORS_ALLOW_ALL_ORIGINS = True
+
+⚠ In production, restrict allowed origins.
+
+------------------------------------------------------------------------
+
+🧱 Production Deployment Checklist
+
+Before deploying:
+
+-   Set DEBUG=False
+-   Configure proper ALLOWED_HOSTS
+-   Use strong DB password
+-   Use secure SECRET_KEY
+-   Configure HTTPS
+-   Use Gunicorn
+-   Use Nginx
+-   Disable CORS_ALLOW_ALL_ORIGINS
 
 ------------------------------------------------------------------------
 
@@ -189,8 +374,8 @@ Add header in requests:
 
     core/
     │
-    ├── core/                 # Project settings
-    ├── projects/             # Project & Membership logic
+    ├── core/              # Project settings
+    ├── projects/
     ├── sprints/
     ├── userstories/
     ├── tasks/
@@ -203,70 +388,6 @@ Add header in requests:
 
 ------------------------------------------------------------------------
 
-🔐 Security Notes
-
--   .env file is excluded via .gitignore
--   SECRET_KEY is not committed
--   Database credentials are environment-based
--   JWT authentication enabled
--   Default permission: IsAuthenticated
-
-------------------------------------------------------------------------
-
-🌐 CORS Configuration
-
-Currently allows all origins for development:
-
-    CORS_ALLOW_ALL_ORIGINS = True
-
-⚠ For production, restrict allowed origins.
-
-------------------------------------------------------------------------
-
-🧪 Useful API Endpoints
-
-  Endpoint              Description
-  --------------------- ------------------------
-  /api/token/           Login
-  /api/token/refresh/   Refresh token
-  /api/users/me/        Get logged-in user
-  /api/projects/        List/Create projects
-  /api/memberships/     Manage project members
-  /api/sprints/         Sprint management
-  /api/userstories/     Backlog management
-
-------------------------------------------------------------------------
-
-🧱 Production Deployment Checklist
-
-Before deploying:
-
--   Set DEBUG=False
--   Set real ALLOWED_HOSTS
--   Use strong DB password
--   Use secure SECRET_KEY
--   Configure HTTPS
--   Use Gunicorn + Nginx
-
-------------------------------------------------------------------------
-
-🛠 Development Workflow
-
-    # Activate venv
-    venv\Scripts\activate
-
-    # Run server
-    python manage.py runserver
-
-    # Make migrations
-    python manage.py makemigrations
-    python manage.py migrate
-
-------------------------------------------------------------------------
-
 👨‍💻 Author
 
-Karthik R S 
-
-------------------------------------------------------------------------
-
+Karthik R S
