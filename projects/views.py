@@ -128,15 +128,30 @@ class ProjectMembershipViewSet(ModelViewSet):
     serializer_class = ProjectMemberSerializer
     permission_classes = [IsAuthenticated]
 
+    # def get_queryset(self):
+    #     user = self.request.user
+
+    #     if user.is_superuser:
+    #         return ProjectMembership.objects.all()
+
+    #     return ProjectMembership.objects.filter(
+    #         project__members__user=user
+    #     ).distinct()
     def get_queryset(self):
         user = self.request.user
+        project_id = self.request.query_params.get("project")
 
-        if user.is_superuser:
-            return ProjectMembership.objects.all()
+        queryset = ProjectMembership.objects.all()
 
-        return ProjectMembership.objects.filter(
-            project__members__user=user
-        ).distinct()
+        # restrict access if not superuser
+        if not user.is_superuser:
+            queryset = queryset.filter(project__members__user=user)
+
+        # filter by project if provided
+        if project_id:
+            queryset = queryset.filter(project_id=project_id)
+
+        return queryset.distinct()
     def get_permissions(self):
         if self.action in ["create", "update", "partial_update", "destroy"]:
         #if self.action == "create":
