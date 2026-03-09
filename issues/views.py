@@ -160,6 +160,7 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Issue
 from .serializers import IssueSerializer
 from rest_framework.exceptions import PermissionDenied
+# from core.permissions import IsQAOrTestLead
 
 
 
@@ -199,6 +200,10 @@ class IssueViewSet(ModelViewSet):
         issue_type = serializer.validated_data.get("type")
 
          # if issue_type == "Bug" and not (user.is_superuser or user.role in ["QA", "TL"]):
+    #     if issue_type == "Bug":
+            # permission = IsQAOrTestLead()
+    #       if not permission.has_permission(request, self):
+    #           raise PermissionDenied("Only QA or Test Lead can create bugs")
         if issue_type == "Bug" and user.role not in ["QA", "TL"]:
            
             raise PermissionDenied("Only QA or Test Lead can create bugs")
@@ -210,14 +215,22 @@ class IssueViewSet(ModelViewSet):
 
         # if user.role not in ["QA", "TL","MGR"]:
         #     raise PermissionDenied("Only QA or Test Lead can update issues")
+#         permission = IsQAOrTestLead()
+
+#       if not user.is_superuser and not permission.has_permission(request, self):
+#           raise PermissionDenied("You cannot modify issue")
         if not (user.is_superuser or user.role in ["QA","TL" ,"MGR"]):
-            raise PermissionDenied("You cannot modify tasks")
+            raise PermissionDenied("You cannot modify issue")
 
         serializer.save()
     def destroy(self, request, *args, **kwargs):
         user = request.user
 
         # Only QA, TL, MGR or superuser can delete
+#         permission = IsQAOrTestLead()
+
+#       if not user.is_superuser and not permission.has_permission(request, self):
+#           raise PermissionDenied("You cannot delete tasks")
         if not (user.is_superuser or user.role in ["QA", "TL", "MGR"]):
             raise PermissionDenied("You cannot delete this issue")
 

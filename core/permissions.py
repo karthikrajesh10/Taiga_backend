@@ -9,7 +9,16 @@ class HasRole(BasePermission):
         if request.user.is_superuser:
             return True
 
-        return getattr(request.user, "role", None) in self.allowed_roles
+        # return getattr(request.user, "role", None) in self.allowed_roles
+
+        # check primary role in User table
+        if request.user.role in self.allowed_roles:
+            return True
+
+        # check additional roles in UserRoles table
+        return request.user.user_roles.filter(
+            role__in=self.allowed_roles
+        ).exists()
 
 
 class IsPM(HasRole):
@@ -37,3 +46,9 @@ class IsApprover(HasRole):
 
 class IsPMOrManager(HasRole):
     allowed_roles = ["PM", "MGR"]
+
+class IsManagerorDeveloper(HasRole):
+    allowed_roles = ["DEV", "MGR"]
+
+class IsTestLeadorQA(HasRole):
+    allowed_roles = ["TL", "QA"]

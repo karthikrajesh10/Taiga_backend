@@ -102,6 +102,7 @@ from core.permissions import IsManager
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.decorators import action
 from rest_framework.response import Response
+# from core.permissions import IsManagerOrDeveloper
 
 
 class TaskViewSet(ModelViewSet):
@@ -145,6 +146,11 @@ class TaskViewSet(ModelViewSet):
 
         # if user.role not in ["DEV", "MGR"]:
         #     raise PermissionDenied("You cannot modify tasks")
+    #     permission = IsManagerOrDeveloper()
+        # if not permission.has_permission(self.request, self):
+    #     raise PermissionDenied("You cannot modify tasks")
+
+    #   serializer.save()
         if not (user.is_superuser or user.role in ["DEV", "MGR"]):
             raise PermissionDenied("You cannot modify tasks")
 
