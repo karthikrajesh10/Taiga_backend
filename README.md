@@ -1,10 +1,5 @@
-------------------------------------------------------------------------
-
-🚀 Taiga Clone Backend
-
-Agile Project Management REST API
-
-Built with Django 5 + Django REST Framework + PostgreSQL + JWT
+🚀 Taiga Clone Backend Agile Project Management REST API Built with
+Django 5 + Django REST Framework + PostgreSQL + JWT
 
 ------------------------------------------------------------------------
 
@@ -12,32 +7,24 @@ Built with Django 5 + Django REST Framework + PostgreSQL + JWT
 
 Taiga Clone Backend is a production-ready REST API for managing:
 
--   👤 Users
--   📁 Projects
--   🏃 Sprints
--   📘 User Stories
--   📋 Tasks
--   🐞 Issues
--   🔐 Role-Based Access Control (RBAC)
+👤 Users 📁 Projects 🏃 Sprints 📘 User Stories 📋 Tasks 🐞 Issues 🔐
+Role-Based Access Control (RBAC)
 
 Authentication is handled using JWT (JSON Web Tokens).
+
+This backend also supports Microsoft OAuth Login using MSAL (Microsoft
+Authentication Library).
 
 ------------------------------------------------------------------------
 
 🛠 Tech Stack
 
--   Django 5
--   Django REST Framework
--   PostgreSQL
--   SimpleJWT
--   RBAC (Custom Role Permissions)
--   CORS Support
+Django 5 Django REST Framework PostgreSQL SimpleJWT RBAC (Custom Role
+Permissions) CORS Support Microsoft OAuth (MSAL)
 
 ------------------------------------------------------------------------
 
 ⚙ Installation Guide
-
-------------------------------------------------------------------------
 
 1️⃣ Clone Repository
 
@@ -70,10 +57,11 @@ Install Individually
     pip install psycopg2-binary
     pip install django-cors-headers
     pip install python-dotenv
+    pip install msal
 
 ✅ Install All In One Command
 
-    pip install django djangorestframework djangorestframework-simplejwt psycopg2-binary django-cors-headers python-dotenv
+    pip install django djangorestframework djangorestframework-simplejwt psycopg2-binary django-cors-headers python-dotenv msal
 
 Or:
 
@@ -143,6 +131,11 @@ Create .env file in project root:
     ACCESS_TOKEN_MINUTES=60
     REFRESH_TOKEN_DAYS=1
 
+    # MICROSOFT OAUTH
+    AZURE_CLIENT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    AZURE_TENANT_ID=common
+    AZURE_CLIENT_SECRET=your_secret_value
+
 Generate secret key:
 
     python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
@@ -186,7 +179,9 @@ All protected endpoints require:
 
 🔹 Login
 
-POST /api/token/
+POST
+
+    /api/token/
 
 Request
 
@@ -206,11 +201,41 @@ Response
 
 🔹 Refresh Token
 
-POST /api/token/refresh/
+POST
+
+    /api/token/refresh/
 
     {
       "refresh": "refresh_token_here"
     }
+
+------------------------------------------------------------------------
+
+🔐 Microsoft Login (OAuth)
+
+Microsoft login is implemented using MSAL (Microsoft Authentication
+Library).
+
+Required Environment Variables
+
+    AZURE_CLIENT_ID = os.environ.get('AZURE_CLIENT_ID')
+    AZURE_TENANT_ID = os.environ.get('AZURE_TENANT_ID', 'common')
+    AZURE_CLIENT_SECRET = os.environ.get('AZURE_CLIENT_SECRET')
+
+Install MSAL
+
+    pip install msal
+
+Microsoft Authentication API
+
+    GET /api/users/auth/microsoft/
+
+Base URL Example:
+
+    http://127.0.0.1:8000/api/users/auth/microsoft/
+
+This endpoint initiates the Microsoft OAuth login flow and authenticates
+users using their Microsoft account.
 
 ------------------------------------------------------------------------
 
@@ -222,7 +247,11 @@ POST /api/token/refresh/
 
 🔹 Signup
 
-POST /api/users/signup/ Permission: Public
+POST
+
+    /api/users/signup/
+
+Permission: Public
 
     {
       "username": "your_username",
@@ -235,13 +264,21 @@ POST /api/users/signup/ Permission: Public
 
 🔹 Get Logged-in User
 
-GET /api/users/me/ Permission: Authenticated Users
+GET
+
+    /api/users/me/
+
+Permission: Authenticated Users
 
 ------------------------------------------------------------------------
 
 🔹 Get All Users
 
-GET /api/users/ Permission: PM, MGR only
+GET
+
+    /api/users/
+
+Permission: PM, MGR only
 
 Response:
 
@@ -256,11 +293,35 @@ Response:
 
 ------------------------------------------------------------------------
 
+🔹 Assign Multiple Roles to User
+
+PATCH / POST
+
+    /api/users/{user_id}/roles
+
+Example:
+
+    http://127.0.0.1:8000/api/users/{user_id}/roles
+
+This API allows assigning multiple roles to a specific user.
+
+Example Request:
+
+    {
+      "roles": ["DEV", "QA"]
+    }
+
+------------------------------------------------------------------------
+
 📁 Projects API
 
 🔹 Create Project
 
-POST /api/projects/ Permission: PM only
+POST
+
+    /api/projects/
+
+Permission: PM only
 
     {
       "name": "Backend System",
@@ -273,7 +334,11 @@ POST /api/projects/ Permission: PM only
 
 🔹 List Projects
 
-GET /api/projects/ Permission: Authenticated Users
+GET
+
+    /api/projects/
+
+Permission: Authenticated Users
 
 ------------------------------------------------------------------------
 
@@ -281,7 +346,11 @@ GET /api/projects/ Permission: Authenticated Users
 
 🔹 Create Sprint
 
-POST /api/sprints/ Permission: MGR only
+POST
+
+    /api/sprints/
+
+Permission: MGR only
 
     {
       "name": "Sprint 1",
@@ -297,7 +366,11 @@ POST /api/sprints/ Permission: MGR only
 
 🔹 Create Story
 
-POST /api/userstories/ Permission: MGR only
+POST
+
+    /api/userstories/
+
+Permission: MGR only
 
     {
       "title": "Implement Login",
@@ -311,7 +384,9 @@ POST /api/userstories/ Permission: MGR only
 
 🔹 Move Story to Sprint
 
-PATCH /api/userstories/{id}/
+PATCH
+
+    /api/userstories/{id}/
 
     {
       "sprint": 1
@@ -323,7 +398,11 @@ PATCH /api/userstories/{id}/
 
 🔹 Create Task
 
-POST /api/tasks/ Permission: MGR only
+POST
+
+    /api/tasks/
+
+Permission: MGR only
 
     {
       "user_story": 1,
@@ -335,7 +414,9 @@ POST /api/tasks/ Permission: MGR only
 
 🔹 Update Task
 
-PATCH /api/tasks/{id}/
+PATCH
+
+    /api/tasks/{id}/
 
 Example:
 
@@ -347,7 +428,11 @@ Example:
 
 🔹 Get My Tasks
 
-GET /api/tasks/my/ Permission: Authenticated Users
+GET
+
+    /api/tasks/my/
+
+Permission: Authenticated Users
 
 Example:
 
@@ -368,30 +453,24 @@ Example:
 
 🔹 Create Issue
 
-POST /api/issues/
+POST
 
-Permission:
+    /api/issues/
 
--   Bug → QA, TL
--   Question/Enhancement → All roles
+Permission: Bug → QA, TL Question/Enhancement → All roles
 
     {
-      "task": 1,
-      "type": "Bug",
-      "title": "Token expires early",
-      "description": "Access token expires too fast"
+     "task": 1,
+     "type": "Bug",
+     "title": "Token expires early",
+     "description": "Access token expires too fast"
     }
 
 ------------------------------------------------------------------------
 
 🔢 Status Values
 
-  Value   Meaning
-  ------- ----------------
-  1       New
-  2       In Progress
-  3       Ready For Test
-  4       Done
+Value | Meaning 1 | New 2 | In Progress 3 | Ready For Test 4 | Done
 
 Frontend must map numeric values to UI labels.
 
@@ -401,44 +480,21 @@ Frontend must map numeric values to UI labels.
 
 🎭 Roles
 
-  Code   Role
-  ------ -----------------
-  PM     Project Manager
-  MGR    Manager
-  DEV    Developer
-  QA     Quality Analyst
-  TL     Team Lead
-  AP     Approver
+Code | Role PM → Project Manager MGR → Manager DEV → Developer QA →
+Quality Analyst TL → Team Lead AP → Approver
 
 ------------------------------------------------------------------------
 
 🛡 Permission Matrix
 
-  ----------------------------------------------------------------------------------
-  Action                                             PM   MGR   DEV   QA   TL   AP
-  -------------------------------------------------- ---- ----- ----- ---- ---- ----
-  Create User                                        ✅   ❌    ❌    ❌   ❌   ❌
-
-  Assign Project                                     ✅   ❌    ❌    ❌   ❌   ❌
-
-  Create Sprint                                      ❌   ✅    ❌    ❌   ❌   ❌
-
-  Create Story                                       ❌   ✅    ❌    ❌   ❌   ❌
-
-  Create Task                                        ❌   ✅    ❌    ❌   ❌   ❌
-
-  Assign Task                                        ❌   ✅    ❌    ❌   ❌   ❌
-
-  Estimate Hours                                     ❌   ❌    ✅    ❌   ❌   ❌
-
-  Move Task Status                                   ❌   ❌    ✅    ❌   ❌   ❌
-
-  Create Issue (Bug)                                 ❌   ❌    ❌    ✅   ✅   ❌
-
-  Create Issue (Question/Enhancement)                ✅   ✅    ✅    ✅   ✅   ✅
-
-  Approve Document                                   ❌   ❌    ❌    ❌   ❌   ✅
-  ----------------------------------------------------------------------------------
+Action | PM | MGR | DEV | QA | TL | AP Create User | ✅ | ❌ | ❌ | ❌ |
+❌ | ❌ Assign Project | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ Create Sprint | ❌
+| ✅ | ❌ | ❌ | ❌ | ❌ Create Story | ❌ | ✅ | ❌ | ❌ | ❌ | ❌
+Create Task | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ Assign Task | ❌ | ✅ | ❌ |
+❌ | ❌ | ❌ Estimate Hours | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ Move Task
+Status | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ Create Issue (Bug) | ❌ | ❌ | ❌ |
+✅ | ✅ | ❌ Create Issue (Question/Enhancement) | ✅ | ✅ | ✅ | ✅ |
+✅ | ✅ Approve Document | ❌ | ❌ | ❌ | ❌ | ❌ | ✅
 
 Special Rule: GET /api/users/ accessible only by PM and MGR.
 
@@ -446,12 +502,10 @@ Special Rule: GET /api/users/ accessible only by PM and MGR.
 
 🚫 Error Handling
 
-  Code   Meaning
-  ------ --------------------------------------
-  400    Validation error
-  401    Unauthorized (Token missing/expired)
-  403    Permission denied
-  404    Resource not found
+Code | Meaning
+
+400 → Validation error 401 → Unauthorized (Token missing/expired) 403 →
+Permission denied 404 → Resource not found
 
 ------------------------------------------------------------------------
 
@@ -465,14 +519,8 @@ Special Rule: GET /api/users/ accessible only by PM and MGR.
 
 🧱 Production Deployment Checklist
 
--   Set DEBUG=False
--   Configure proper ALLOWED_HOSTS
--   Use strong DB password
--   Use secure SECRET_KEY
--   Enable HTTPS
--   Use Gunicorn
--   Use Nginx
--   Restrict CORS
+Set DEBUG=False Configure proper ALLOWED_HOSTS Use strong DB password
+Use secure SECRET_KEY Enable HTTPS Use Gunicorn Use Nginx Restrict CORS
 
 ------------------------------------------------------------------------
 
@@ -497,5 +545,3 @@ Special Rule: GET /api/users/ accessible only by PM and MGR.
 👨‍💻 Author
 
 Karthik R S
-
-------------------------------------------------------------------------

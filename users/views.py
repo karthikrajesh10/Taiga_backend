@@ -68,6 +68,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
+import requests as http_requests
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User
 from .serializers import UserSerializer, SignupSerializer,UserListSerializer
@@ -165,3 +167,55 @@ class AssignUserRolesView(APIView):
     
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+
+
+
+
+class MicrosoftLoginView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        ms_token = request.data.get('access_token')
+        if not ms_token:
+            return Response({'error': 'access_token is required'}, status=400)
+
+        # Verify token with Microsoft Graph
+        graph_response = http_requests.get(
+            'https://graph.microsoft.com/v1.0/me',
+            headers={'Authorization': f'Bearer {ms_token}'}
+        )
+
+        if graph_response.status_code != 200:
+            return Response({'error': 'Invalid Microsoft token'}, status=401)
+
+        ms_user = graph_response.json()
+        email = ms_user.get('mail') or ms_user.get('userPrincipalName')
+        username = ms_user.get('displayName', '').replace(' ', '_').lower()
+
+        if not email:
+            return Response({'error': 'Could not retrieve email from Microsoft'}, status=400)
+
+        # Find or create the user
+        user, created = User.objects.get_or_create(
+            email=email,
+            defaults={
+                'username': username or email.split('@')[0],
+                'is_active': True,
+                'role': 'DEV',  # default role — change as needed
+            }
+        )
+
+        # Issue your app's JWT — same as regular login
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'role': getattr(user, 'role', None),
+                'is_superuser': user.is_superuser,
+            },
+            'created': created,
+        })

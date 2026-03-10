@@ -196,3 +196,8 @@ CORS_ALLOW_HEADERS = [
 ]
 
 AUTH_USER_MODEL = "users.User"
+
+
+AZURE_CLIENT_ID = os.environ.get('AZURE_CLIENT_ID')
+AZURE_TENANT_ID = os.environ.get('AZURE_TENANT_ID', 'common')
+AZURE_CLIENT_SECRET = os.environ.get('AZURE_CLIENT_SECRET')
