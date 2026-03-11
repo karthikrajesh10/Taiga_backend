@@ -28,23 +28,23 @@
 
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
-
+from core.permissions import IsManager
 from .models import UserStory
 from .serializers import UserStorySerializer
-from core.permissions import IsManager
+
 
 
 class UserStoryViewSet(ModelViewSet):
     serializer_class = UserStorySerializer
     permission_classes = [IsAuthenticated]
 
-   
+
     def get_permissions(self):
         if self.action in ["create", "update", "partial_update", "destroy"]:
         #if self.action == "create":
             return [IsAuthenticated(), IsManager()]
         return [IsAuthenticated()]
-    
+
     def get_queryset(self):
         user = self.request.user
 
@@ -71,3 +71,4 @@ class UserStoryViewSet(ModelViewSet):
             queryset = queryset.filter(sprint_id=sprint_id)
 
         return queryset
+

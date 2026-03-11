@@ -174,9 +174,11 @@
 #     def __str__(self):
 #         return f"#{self.ref} {self.subject}"
 
+from django.core.exceptions import ValidationError 
 from django.db import models
-from tasks.models import Task
 from django.conf import settings
+from tasks.models import Task
+
 
 
 class Issue(models.Model):

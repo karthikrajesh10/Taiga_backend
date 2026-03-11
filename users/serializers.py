@@ -14,8 +14,9 @@
 #         ]
 
 from rest_framework import serializers
-from .models import User
-from .models import UserRoles
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from .models import User,UserRoles
+
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -76,7 +77,7 @@ class UserListSerializer(serializers.ModelSerializer):
         )
 
 
-from .models import UserRoles
+
 
 
 class AssignRolesSerializer(serializers.Serializer):
@@ -84,7 +85,7 @@ class AssignRolesSerializer(serializers.Serializer):
         child=serializers.ChoiceField(choices=UserRoles.ROLE_CHOICES)
     )
 
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):

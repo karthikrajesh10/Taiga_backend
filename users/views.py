@@ -63,23 +63,26 @@
 #             status=status.HTTP_201_CREATED
 #         )
 
+import requests as http_requests
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
-import requests as http_requests
-from rest_framework_simplejwt.tokens import RefreshToken
-
-from .models import User
-from .serializers import UserSerializer, SignupSerializer,UserListSerializer
 from rest_framework.generics import ListAPIView
-from core.permissions import IsPM
-from core.permissions import IsPMOrManager
-from .models import UserRoles
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+
+from core.permissions import IsPM,IsPMOrManager
+
+
+from .models import User,UserRoles
+from .serializers import UserSerializer, SignupSerializer,UserListSerializer
+
 from .serializers import AssignRolesSerializer
 from .serializers import CustomTokenObtainPairSerializer
-from rest_framework_simplejwt.views import TokenObtainPairView
+
 
 
 
@@ -182,7 +185,7 @@ class MicrosoftLoginView(APIView):
         # Verify token with Microsoft Graph
         graph_response = http_requests.get(
             'https://graph.microsoft.com/v1.0/me',
-            headers={'Authorization': f'Bearer {ms_token}'}
+            headers={'Authorization': f'Bearer {ms_token}'},timeout=10
         )
 
         if graph_response.status_code != 200:

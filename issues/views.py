@@ -156,10 +156,11 @@
 #         )
 
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from .models import Issue
 from .serializers import IssueSerializer
-from rest_framework.exceptions import PermissionDenied
+
 # from core.permissions import IsQAOrTestLead
 
 
@@ -177,6 +178,21 @@ class IssueViewSet(ModelViewSet):
     #         queryset = queryset.filter(task_id=task_id)
 
     #     return queryset
+    # def get_queryset(self):
+    #     user = self.request.user
+
+    #     if user.is_superuser:
+    #         queryset = Issue.objects.all()
+    #     else:
+    #         queryset = Issue.objects.filter(
+    #             task__user_story__project__members__user=user
+    #         ).distinct()
+
+    #     task_id = self.request.query_params.get("task")
+    #     if task_id:
+    #         queryset = queryset.filter(task_id=task_id)
+
+    #     return queryset
     def get_queryset(self):
         user = self.request.user
 
@@ -187,6 +203,14 @@ class IssueViewSet(ModelViewSet):
                 task__user_story__project__members__user=user
             ).distinct()
 
+        # Filter by project_slug ← this was missing
+        project_slug = self.request.query_params.get("project_slug")
+        if project_slug:
+            queryset = queryset.filter(
+                task__user_story__project__slug=project_slug
+            )
+
+        # Filter by task
         task_id = self.request.query_params.get("task")
         if task_id:
             queryset = queryset.filter(task_id=task_id)

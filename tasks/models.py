@@ -58,9 +58,12 @@
 #     def __str__(self):
 #         return f"#{self.ref} {self.subject}"
 
+from django.core.exceptions import ValidationError 
 from django.db import models
-from userstories.models import UserStory
 from django.conf import settings
+from userstories.models import UserStory
+
+
 
 
 class Task(models.Model):

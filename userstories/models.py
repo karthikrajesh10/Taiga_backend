@@ -89,10 +89,12 @@
 #     def __str__(self):
 #         return f"#{self.ref} {self.subject}"
 
+from django.core.exceptions import ValidationError 
 from django.db import models
+from django.conf import settings
 from projects.models import Project
 from sprints.models import Sprint
-from django.conf import settings
+
 
 
 class UserStory(models.Model):

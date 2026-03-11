@@ -88,11 +88,12 @@
 
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import PermissionDenied
+# from rest_framework.exceptions import PermissionDenied
+from core.permissions import IsPM
 
 from .models import Project, ProjectMembership
 from .serializers import ProjectSerializer, ProjectMemberSerializer
-from core.permissions import IsPM
+
 
 
 class ProjectViewSet(ModelViewSet):

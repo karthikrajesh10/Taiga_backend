@@ -96,12 +96,13 @@
 
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
-from .models import Task
-from .serializers import TaskSerializer
-from core.permissions import IsManager
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from .models import Task
+from .serializers import TaskSerializer
+from core.permissions import IsManager
+
 # from core.permissions import IsManagerOrDeveloper
 
 
