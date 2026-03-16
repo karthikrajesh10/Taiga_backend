@@ -102,8 +102,7 @@ from rest_framework.response import Response
 from .models import Task
 from .serializers import TaskSerializer
 from core.permissions import IsManager
-
-# from core.permissions import IsManagerOrDeveloper
+from core.permissions import IsManagerorDeveloper
 
 
 class TaskViewSet(ModelViewSet):
@@ -124,6 +123,8 @@ class TaskViewSet(ModelViewSet):
         
         #if self.action == "create":
             return [IsAuthenticated(), IsManager()]
+        if self.action in ["update", "partial_update"]:
+            return [IsAuthenticated(), IsManagerorDeveloper()]
         return [IsAuthenticated()]
     
     def get_queryset(self):
@@ -152,10 +153,28 @@ class TaskViewSet(ModelViewSet):
     #     raise PermissionDenied("You cannot modify tasks")
 
     #   serializer.save()
-        if not (user.is_superuser or user.role in ["DEV", "MGR"]):
-            raise PermissionDenied("You cannot modify tasks")
+        # if not (user.is_superuser or user.role in ["DEV", "MGR"]):
+        #     raise PermissionDenied("You cannot modify tasks")
+        # if "estimated_hours" in serializer.validated_data:
+        #     if not (user.is_superuser or getattr(user, "role", None) == "MGR"):
+        #         raise PermissionDenied("Only managers can update estimated hours.")
+
+        # if "actual_hours" in serializer.validated_data:
+        #     if user != serializer.instance.assignee:
+        #         raise PermissionDenied("You can only log hours on tasks assigned to you.")
+        if "estimated_hours" in serializer.validated_data:
+            if not IsManager().has_permission(self.request, self):
+                raise PermissionDenied("Only managers can update estimated hours.")
+
+        # if "actual_hours" in serializer.validated_data:
+        #     if user != serializer.instance.assignee:
+        #         raise PermissionDenied("You can only log hours on tasks assigned to you.")
+        if "actual_hours" in serializer.validated_data:
+            if not user.is_superuser and user != serializer.instance.assignee:
+                raise PermissionDenied("You can only log hours on tasks assigned to you.")
 
         serializer.save()
+        
     # def destroy(self, request, *args, **kwargs):
     #     user = request.user
 
