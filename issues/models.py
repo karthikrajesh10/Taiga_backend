@@ -187,7 +187,7 @@ class Issue(models.Model):
         (1, "New"),
         (2, "In Progress"),
         (3, "Ready For Test"),
-        (4, "Closed"),
+        (4, "Done"),
     )
 
     task = models.ForeignKey(

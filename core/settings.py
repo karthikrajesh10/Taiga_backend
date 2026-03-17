@@ -66,6 +66,8 @@ INSTALLED_APPS = [
     'userstories',
     'tasks',
     'issues',
+    'timelog',
+    'statuses',
     
 ]
 

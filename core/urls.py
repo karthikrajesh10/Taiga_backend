@@ -66,4 +66,5 @@ urlpatterns = [
     path("api/userstories/", include("userstories.urls")),
     path("api/tasks/", include("tasks.urls")),
     path("api/issues/", include("issues.urls")),
+    path("api/timelogs/", include("timelog.urls")),
 ]

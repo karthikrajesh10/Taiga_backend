@@ -98,7 +98,7 @@ class Task(models.Model):
     )
 
     estimated_hours = models.FloatField(null=True, blank=True)
-    actual_hours = models.FloatField(null=True, blank=True)
+    # actual_hours = models.FloatField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -112,5 +112,10 @@ class Task(models.Model):
             old = type(self).objects.get(pk=self.pk)
             if self.status < old.status:
                 raise ValidationError("Cannot move status backwards")
+        
+    @property
+    def actual_hours(self):
+        result = self.time_logs.aggregate(total=models.Sum("worked_hours"))
+        return result["total"] or 0.0
 
 
